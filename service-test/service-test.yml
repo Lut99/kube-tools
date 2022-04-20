@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-test
+spec:
+  selector:
+    matchLabels:
+      run: service-test-pod
+  template:
+    metadata:
+      labels:
+        run: service-test-pod
+    spec:
+      containers:
+      - name: service-test-container
+        image: brane05.lab.uvalight.net:5000/service-test
+        ports:
+        - containerPort: 8080
+      imagePullSecrets:
+      - name: regcred
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-test
+spec:
+  selector:
+    run: service-test-pod
+  type: NodePort
+  ports:
+  - port: 8080
+    nodePort: 30080
+  # type: ClusterIP
+  # ports:
+  # - port: 8080
