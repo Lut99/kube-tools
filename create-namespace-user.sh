@@ -227,7 +227,7 @@ EOT
 
 
 echo ""
-echo "Done. You can now send './$namespace-config.yml' to the students."
+echo "Done. You can use './$namespace-config.yml' to connect with the shielded account."
 echo ""
 
 
