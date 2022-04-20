@@ -167,6 +167,7 @@ fi
 cmd="$cmd -- sh"
 
 # Run it
+echo " > $cmd"
 bash -c "$cmd" || exit $?
 
 # Delete the pod afterwards
