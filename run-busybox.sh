@@ -12,6 +12,7 @@
 ##### CLI #####
 # Define default values
 node=""
+namespace=""
 config=""
 
 # Iterate over the arguments to parse
@@ -29,6 +30,11 @@ for arg in "$@"; do
                 # We'll want to parse its value next
                 state="node"
                 continue
+    
+            elif [[ "$arg" == "-N" || "$arg" == "--namespace" ]]; then
+                # We'll want to parse its value next
+                state="namespace"
+                continue
             
             elif [[ "$arg" == "-c" || "$arg" == "--config" ]]; then
                 # We'll want to parse its value next
@@ -43,6 +49,8 @@ for arg in "$@"; do
                 echo "Options:"
                 echo "  -n,--node <name>         If given, tries to schedule the busybox on the given node. Nodes are"
                 echo "                           assumed to be identifyable by a tag with 'name=<name>'."
+                echo "  -N,--namespace <name>    If given, adds the busybox to the given namespace instead of the default"
+                echo "                           one."
                 echo "  -c,--config <path>       The path to the config to use when launching busybox. If omitted, uses"
                 echo "                           the default kubectl config."
                 echo "  -h,--help                Shows this help string, then quits the script."
@@ -86,6 +94,21 @@ for arg in "$@"; do
         # Reset back to the normal state
         state="start"
 
+    elif [[ "$state" == "namespace" ]]; then
+        # Make sure it's not an option
+        if [[ "$accept_opts" -eq 1 && "$arg" =~ ^- ]]; then
+            echo "Missing value for '--namespace'"
+            errored=1
+            state="start"
+            continue
+        fi
+
+        # Accept the new name
+        namespace="$arg"
+
+        # Reset back to the normal state
+        state="start"
+
     elif [[ "$state" == "config" ]]; then
         # Make sure it's not an option
         if [[ "$accept_opts" -eq 1 && "$arg" =~ ^- ]]; then
@@ -111,6 +134,9 @@ done
 if [[ "$state" == "node" ]]; then
     echo "Missing value for '--node'"
     errored=1
+elif [[ "$state" == "namespace" ]]; then
+    echo "Missing value for '--namespace'"
+    errored=1
 elif [[ "$state" == "config" ]]; then
     echo "Missing value for '--config'"
     errored=1
@@ -130,6 +156,9 @@ fi
 cmd="kubectl"
 if [[ ! -z "$config" ]]; then
     cmd="$cmd --kubeconfig='$config'"
+fi
+if [[ ! -z "$namespace" ]]; then
+    cmd="$cmd --namespace='$namespace'"
 fi
 cmd="$cmd -i --tty busybox --image=busybox --restart=Never"
 if [[ ! -z "$node" ]]; then
