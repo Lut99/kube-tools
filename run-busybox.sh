@@ -170,8 +170,19 @@ cmd="$cmd -- sh"
 echo " > $cmd"
 bash -c "$cmd" || exit $?
 
-# Delete the pod afterwards
-kubectl delete pod busybox
+# Prepare the delete command (to take the different config and namespace into account)
+cmd="kubectl"
+if [[ ! -z "$config" ]]; then
+    cmd="$cmd --kubeconfig='$config'"
+fi
+if [[ ! -z "$namespace" ]]; then
+    cmd="$cmd --namespace='$namespace'"
+fi
+cmd="$cmd delete pod busybox"
+
+# Run it
+echo " > $cmd"
+bash -c "$cmd" || exit $?
 
 
 
