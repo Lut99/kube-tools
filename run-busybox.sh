@@ -160,7 +160,7 @@ fi
 if [[ ! -z "$namespace" ]]; then
     cmd="$cmd --namespace='$namespace'"
 fi
-cmd="$cmd -i --tty busybox --image=busybox --restart=Never"
+cmd="$cmd run -i --tty busybox --image=busybox --restart=Never"
 if [[ ! -z "$node" ]]; then
     cmd="$cmd --overrides=\"{\\\"apiVersion}\\\": \\\"v1\\\", \\\"spec\\\": {\\\"nodeSelector\\\": { \\\"name\\\": \\\"$node\\\" }}}\""
 fi
